@@ -4,6 +4,7 @@ import router from './router'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config';
 import './axios';
+import '@/assets/styles.scss';
 
 
 import "./assets/app.css"
@@ -17,6 +18,8 @@ import Password from 'primevue/password';
 import Button from 'primevue/button';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import DataView from 'primevue/dataview';
+import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions'  
 
 
 const app = createApp(App)
@@ -31,6 +34,8 @@ app.component('Password', Password);
 app.component('Button', Button);
 app.component('TabView', TabView);
 app.component('TabPanel', TabPanel);
+app.component('DataView', DataView);
+app.component('DataViewLayoutOptions', DataViewLayoutOptions);
 
 
 app.mount('#app')

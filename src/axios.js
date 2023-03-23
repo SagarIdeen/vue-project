@@ -3,7 +3,7 @@ import { apiLink } from "./config";
 
 axios.defaults.baseURL = apiLink;
 
-if (localStorage.getItem("token_expense")) {
+if (localStorage.getItem("token_user")) {
   axios.defaults.headers.common[
     "Authorization"
   ] = `Bearer ${localStorage.getItem("token_user")}`;
