@@ -10,9 +10,12 @@ const model = ref([
     {
         items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/product' }]
     },
+    {
+        items: [{ label: 'Cart', icon: 'pi pi-fw pi-shopping-cart', to: '/cart' }]
+    },
 
-  
-   
+
+
 ]);
 </script>
 

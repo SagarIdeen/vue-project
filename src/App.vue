@@ -3,11 +3,11 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
- <RouterView/>
+  <RouterView />
 </template>
 
 <style scoped>
-.container{
+.container {
   display: flex;
   align-items: center;
   justify-content: center;

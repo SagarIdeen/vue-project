@@ -11,22 +11,27 @@
             <template #list="slotProps">
                 <div class="col-12">
                     <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
-                        <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.name" />
-                        <div class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                        <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
+                            :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.url}`"
+                            :alt="slotProps.data.name" />
+                        <div
+                            class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                             <div class="flex flex-column align-items-center sm:align-items-start gap-3">
                                 <div class="text-2xl font-bold text-900">{{ slotProps.data.name }}</div>
-                                <Rating :modelValue="slotProps.data.rating" readonly :cancel="false"></Rating>
+                                <!-- <Rating :modelValue="slotProps.data.rating" readonly :cancel="false"></Rating> -->
                                 <div class="flex align-items-center gap-3">
                                     <span class="flex align-items-center gap-2">
                                         <i class="pi pi-tag"></i>
-                                        <span class="font-semibold">{{ slotProps.data.category }}</span>
+                                        <span class="font-semibold">{{ slotProps.data.category.name }}</span>
                                     </span>
-                                    <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)"></Tag>
+                                    <!-- <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)"> -->
+                                    <!-- </Tag> -->
                                 </div>
                             </div>
                             <div class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                <span class="text-2xl font-semibold">${{ slotProps.data.price }}</span>
-                                <Button icon="pi pi-shopping-cart" rounded :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
+                                <span class="text-2xl font-semibold">Rs.{{ slotProps.data.price }}</span>
+                                <Button icon="pi pi-shopping-cart" rounded
+                                    :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
                             </div>
                         </div>
                     </div>
@@ -39,18 +44,21 @@
                         <div class="flex flex-wrap align-items-center justify-content-between gap-2">
                             <div class="flex align-items-center gap-2">
                                 <i class="pi pi-tag"></i>
-                                <span class="font-semibold">{{ slotProps.data.category }}</span>
+                                <span class="font-semibold">{{ slotProps.data.category.name }}</span>
                             </div>
-                            <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)"></Tag>
+                            <!-- <Tag :value="slotProps.data.inventoryStatus" :severity="getSeverity(slotProps.data)"></Tag> -->
                         </div>
                         <div class="flex flex-column align-items-center gap-3 py-5">
-                            <img class="w-9 shadow-2 border-round" :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.name" />
+                            <img class="w-9 shadow-2 border-round"
+                                :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.url}`"
+                                :alt="slotProps.data.name" />
                             <div class="text-2xl font-bold">{{ slotProps.data.name }}</div>
-                            <Rating value="{product.rating}" readonly :cancel="false"></Rating>
+                            <!-- <Rating value="{product.rating}" readonly :cancel="false"></Rating> -->
                         </div>
                         <div class="flex align-items-center justify-content-between">
                             <span class="text-2xl font-semibold">${{ slotProps.data.price }}</span>
-                            <Button icon="pi pi-shopping-cart" rounded :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
+                            <Button icon="pi pi-shopping-cart" rounded @click="sample(slotProps.data)"
+                                :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
                         </div>
                     </div>
                 </div>
@@ -62,37 +70,48 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from 'axios'
-import { ProductService } from '@/service/ProductService';
+import { useRouter } from 'vue-router'
+
+// import { ProductService } from '@/service/ProductService';
+const router = useRouter()
 
 onMounted(async () => {
-    try {   
-            const response =await axios.get("product")
-            console.log(JSON.stringify(response.data));
-            
-        
+    try {
+        const response = await axios.get("product")
+        // console.log(JSON.stringify(response.data));
+        products.value = response.data
+
+
     } catch (error) {
         console.log(error);
     }
-    ProductService.getProducts().then((data) => (products.value = data.slice(0, 12)));
+    // ProductService.getProducts().then((data) => (products.value = data.slice(0, 12)));
 });
 
+const sample = (s) => {
+    // console.log(JSON.stringify(s));
+
+    router.push('/cart')
+}
 const products = ref();
 const layout = ref('grid');
 
-const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
-        case 'INSTOCK':
-            return 'success';
 
-        case 'LOWSTOCK':
-            return 'warning';
 
-        case 'OUTOFSTOCK':
-            return 'danger';
+// const getSeverity = (product) => {
+//     switch (product.inventoryStatus) {
+//         case 'INSTOCK':
+//             return 'success';
 
-        default:
-            return null;
-    }
-}
+//         case 'LOWSTOCK':
+//             return 'warning';
+
+//         case 'OUTOFSTOCK':
+//             return 'danger';
+
+//         default:
+//             return null;
+//     }
+// }
 
 </script>
