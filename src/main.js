@@ -11,7 +11,8 @@ import "./assets/app.css"
 import "primevue/resources/themes/lara-light-indigo/theme.css"; 
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
-import '/node_modules/primeflex/primeflex.css'          // PrimeFlex
+import '/node_modules/primeflex/primeflex.css'  
+        // PrimeFlex
 
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
@@ -33,6 +34,11 @@ import DialogService from 'primevue/dialogservice';
 import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import Tag from 'primevue/tag';
+import ConfirmDialog from 'primevue/confirmdialog';
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmPopup from 'primevue/confirmpopup';
+
+
 
 
 
@@ -50,6 +56,7 @@ app.use(PrimeVue);
 app.use(pinia)
 app.use(ToastService);
 app.use(DialogService);
+app.use(ConfirmationService);
 
 
 app.component('InputText', InputText);
@@ -70,6 +77,9 @@ app.component('Toast', Toast);
 app.component('Textarea', Textarea);
 app.component('Dropdown', Dropdown);
 app.component('Tag', Tag);
+app.component('ConfirmDialog', ConfirmDialog);
+app.component('ConfirmPopup', ConfirmPopup);
+
 
 
 app.mount('#app')

@@ -30,8 +30,9 @@
                             </div>
                             <div class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span class="text-2xl font-semibold">Rs.{{ slotProps.data.price }}</span>
-                                <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
-                                    :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
+                                <Button icon="pi pi-shopping-cart" rounded @click="confirm1($event)"></Button>
+                            <!-- <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
+                                                    :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button> -->
                             </div>
                         </div>
                     </div>
@@ -64,6 +65,8 @@
                 </div>
             </template>
         </DataView>
+        <ConfirmPopup></ConfirmPopup>
+
     </div>
 </template>
 
@@ -71,11 +74,16 @@
 import { ref, onMounted } from "vue";
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
 
-const products = ref();
+const confirm = useConfirm();
+const toast = useToast();
+const router = useRouter()
 const layout = ref('grid');
 
-const router = useRouter()
+const products = ref();
+
 
 onMounted(async () => {
     try {
@@ -87,6 +95,21 @@ onMounted(async () => {
         console.log(error);
     }
 });
+
+const confirm1 = (event) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Do you want to delete this record?',
+        icon: 'pi pi-info-circle',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+};
 
 const addCart = async (item) => {
     const userId = localStorage.getItem("user_id");
