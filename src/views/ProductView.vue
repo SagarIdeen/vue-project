@@ -30,7 +30,7 @@
                             </div>
                             <div class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span class="text-2xl font-semibold">Rs.{{ slotProps.data.price }}</span>
-                                <Button icon="pi pi-shopping-cart" rounded
+                                <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
                                     :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
                             </div>
                         </div>
@@ -57,7 +57,7 @@
                         </div>
                         <div class="flex align-items-center justify-content-between">
                             <span class="text-2xl font-semibold">${{ slotProps.data.price }}</span>
-                            <Button icon="pi pi-shopping-cart" rounded @click="sample(slotProps.data)"
+                            <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
                                 :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
                         </div>
                     </div>
@@ -72,29 +72,41 @@ import { ref, onMounted } from "vue";
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
-// import { ProductService } from '@/service/ProductService';
+const products = ref();
+const layout = ref('grid');
+
 const router = useRouter()
 
 onMounted(async () => {
     try {
         const response = await axios.get("product")
-        // console.log(JSON.stringify(response.data));
         products.value = response.data
 
 
     } catch (error) {
         console.log(error);
     }
-    // ProductService.getProducts().then((data) => (products.value = data.slice(0, 12)));
 });
 
-const sample = (s) => {
-    // console.log(JSON.stringify(s));
+const addCart = async (item) => {
+    const userId = localStorage.getItem("user_id");
+    console.log(JSON.stringify(item), userId);
+    try {
+        const response = await axios.post("cart", {
+            "quantity": 1,
+            "userId": userId,
+            "productId": item.id
+        })
+        console.log(JSON.stringify(response));
 
-    router.push('/cart')
+        router.push('/cart')
+
+    } catch (error) {
+        console.log(error);
+    }
+
 }
-const products = ref();
-const layout = ref('grid');
+
 
 
 
