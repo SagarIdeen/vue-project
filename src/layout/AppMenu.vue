@@ -11,7 +11,13 @@ const model = ref([
         items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/product' }]
     },
     {
-        items: [{ label: 'Cart', icon: 'pi pi-fw pi-shopping-cart', to: '/cart' }]
+        items: [{ label: 'Cart', icon: 'pi pi-fw pi-cart-plus', to: '/cart' }]
+    },
+    {
+        items: [{ label: 'Orders', icon: 'pi pi-fw pi-shopping-bag', to: '/orders' }]
+    },
+    {
+        items: [{ label: 'Sales Return', icon: 'pi pi-fw pi-undo', to: '/salesReturn' }]
     },
 
 
