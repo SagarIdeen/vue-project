@@ -8,9 +8,12 @@ import { required, email } from '@vuelidate/validators'
 import { useToast } from "primevue/usetoast";
 
 
+
 const router = useRouter()
 const isRegister = ref(false);
 const toast = useToast();
+const loading = ref(false);
+
 
 
 
@@ -43,7 +46,7 @@ onMounted(() => {
 })
 
 const onToggle = () => {
-    // formData.email = "";
+    formData.email = "";
     formData.name = "";
     formData.password = "";
     isRegister.value = !isRegister.value
@@ -54,6 +57,7 @@ async function onSubmit() {
     if (isRegister.value) {
         const result = await v$.value.$validate();
         if (result) {
+            loading.value = true;
             try {
                 await axios.post("user", {
                     "name": formData.name,
@@ -63,7 +67,9 @@ async function onSubmit() {
                 })
                     .then((response) => {
                         console.log('Register response :', response.data);
+                        formData.password = "";
                         isRegister.value = !isRegister.value
+                        loading.value = false;
                     })
 
             } catch (error) {
@@ -74,7 +80,7 @@ async function onSubmit() {
         formData.name = "default"
         const result = await v$.value.$validate();
         if (result) {
-
+            loading.value = true;
             try {
                 await axios.post("auth/login", {
                     "email": formData.email,
@@ -92,6 +98,7 @@ async function onSubmit() {
                     localStorage.setItem("user_id", decoded.sub)
                 })
                     .finally(() => {
+                        loading.value = false;
                         router.push('/')
                     })
 
@@ -131,11 +138,12 @@ async function onSubmit() {
 
                         <label for="password1" class="block text-900 font-medium text-xl mt-5 mb-2">Password</label>
                         <Password id="password1" v-model="formData.password" placeholder="Password" :toggleMask="true"
-                            class="w-full" inputClass="w-full" inputStyle="padding:1rem"></Password><br />
+                            class="w-full" inputClass="w-full" :feedback="false" inputStyle="padding:1rem"></Password><br />
                         <span v-for="error in v$.password.$errors" :key="error.$uid" class="text-red-500">{{ error.$message
                         }}</span>
 
-                        <Button label="Sign In" class="w-full p-3 text-xl mt-5" @click="onSubmit"></Button>
+                        <Button label="Sign In" class="w-full p-3 text-xl mt-5" :loading="loading"
+                            @click="onSubmit"></Button>
                         <div class="flex align-items-center justify-content-between mt-5 gap-5">
                             <span></span>
                             <Button link class="font-medium no-underline ml-2  cursor-pointer" @click="onToggle"
@@ -172,7 +180,8 @@ async function onSubmit() {
                         <span v-for="error in v$.password.$errors" :key="error.$uid" class="text-red-500">{{ error.$message
                         }}</span>
 
-                        <Button label="Register" class="w-full p-3 text-xl mt-5" @click="onSubmit"></Button>
+                        <Button label="Register" class="w-full p-3 text-xl mt-5" :loading="loading"
+                            @click="onSubmit"></Button>
                         <div class="flex align-items-center justify-content-between mt-5 gap-5">
                             <span></span>
                             <Button link class="font-medium no-underline ml-2  cursor-pointer" @click="onToggle"

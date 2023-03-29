@@ -30,9 +30,8 @@
                             </div>
                             <div class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span class="text-2xl font-semibold">Rs.{{ slotProps.data.price }}</span>
-                                <Button icon="pi pi-shopping-cart" rounded @click="confirm1($event)"></Button>
-                            <!-- <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
-                                                    :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button> -->
+                                <Button icon="pi pi-shopping-cart" rounded
+                                    @click="confirm1($event, slotProps.data)"></Button>
                             </div>
                         </div>
                     </div>
@@ -58,15 +57,14 @@
                         </div>
                         <div class="flex align-items-center justify-content-between">
                             <span class="text-2xl font-semibold">${{ slotProps.data.price }}</span>
-                            <Button icon="pi pi-shopping-cart" rounded @click="addCart(slotProps.data)"
-                                :disabled="slotProps.data.inventoryStatus === 'OUTOFSTOCK'"></Button>
+                            <Button icon="pi pi-shopping-cart" rounded @click="confirm1($event, slotProps.data)"></Button>
                         </div>
                     </div>
                 </div>
             </template>
         </DataView>
         <ConfirmPopup></ConfirmPopup>
-
+        <Toast />
     </div>
 </template>
 
@@ -96,17 +94,18 @@ onMounted(async () => {
     }
 });
 
-const confirm1 = (event) => {
+const confirm1 = (event, item) => {
+    console.log(JSON.stringify(item));
     confirm.require({
         target: event.currentTarget,
-        message: 'Do you want to delete this record?',
+        message: 'Do you want to add this product to your cart?',
         icon: 'pi pi-info-circle',
-        acceptClass: 'p-button-danger',
+        acceptClass: 'p-button-primary',
         accept: () => {
-            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+            addCart(item);
         },
         reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+            toast.add({ severity: 'info', summary: 'Cancelled', life: 3000 });
         }
     });
 };
@@ -121,11 +120,13 @@ const addCart = async (item) => {
             "productId": item.id
         })
         console.log(JSON.stringify(response));
+        toast.add({ severity: 'success', summary: 'Confirmed', detail: 'Product Added', life: 3000 });
 
-        router.push('/cart')
+        // router.push('/cart')
 
     } catch (error) {
         console.log(error);
+        toast.add({ severity: 'error', summary: 'Error', detail: error.code, life: 3000 });
     }
 
 }

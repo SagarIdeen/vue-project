@@ -66,9 +66,12 @@
                     </div>
                     <div v-if="userAddress.length && !showNewAddress"
                         class="field col-2 md:col-2 flex align-content-center flex-wrap ">
-                        <Button v-if="selectedAddress" class="mt-2" icon="pi pi-trash" severity="danger" text
-                            @click="onAddressDelete()" />
-                        <Button class="mt-2" icon="pi pi-plus" text @click="showNewAddress = !showNewAddress" />
+                        <div class="mt-3">
+
+                            <Button v-if="selectedAddress" class="mt-2" icon="pi pi-trash" severity="danger" text
+                                @click="confirm2($event)" />
+                            <Button class="mt-2" icon="pi pi-plus" text @click="showNewAddress = !showNewAddress" />
+                        </div>
                     </div>
                     <!-- else -->
 
@@ -110,6 +113,8 @@
             </template>
         </Dialog>
         <Toast />
+        <ConfirmPopup></ConfirmPopup>
+
     </div>
 </template>
 
@@ -118,8 +123,9 @@ import { ref, onMounted } from 'vue';
 import { ProductService } from '@/service/ProductService';
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 
-
+const confirm = useConfirm();
 const toast = useToast();
 
 const products = ref();
@@ -130,7 +136,7 @@ const showNewAddress = ref(false);
 const product = ref({});
 const userAddress = ref([])
 const address = ref('');
-const selectedAddress = ref();
+const selectedAddress = ref(null);
 const totalAmount = ref(0);
 const totalQty = ref(0);
 
@@ -161,8 +167,8 @@ const getUserAddress = async (user)=>{
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
-
-    try {
+    if (newData.quantity > 0) {
+        try {
         const response = await axios.patch(`cart/${newData.id}`,{
         "quantity": parseInt(newData.quantity)
         })
@@ -171,6 +177,11 @@ const onRowEditSave = async (event) => {
     } catch (error) {
         console.log(error);
     }
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail:' Product quantity must be greater than 0', life: 3000 });
+    }
+
+    
 };
 
 const confirmDeleteSelected = () => {
@@ -201,7 +212,7 @@ const deleteProduct = async () => {
 
 const onAddressSave =async ()=>{
 
-    if (showNewAddress && address) {
+    if (address.value != '') {
         try {
             const response = await axios.post("address",{
             "address": address.value,
@@ -210,10 +221,13 @@ const onAddressSave =async ()=>{
             console.log(response.data);
             userAddress.value = await getUserAddress(user_id);
             showNewAddress.value = false
+            address.value = ''
         } catch (error) {
             console.error();
         }
 
+    }else{
+        toast.add({severity:'warn', summary: 'Warnign', detail: 'Enter shipping address', life: 3000});
     }
 }
 
@@ -223,6 +237,7 @@ console.log('enter');
         const response = await axios.delete(`address/${selectedAddress.value.id}`)
         userAddress.value = await getUserAddress(user_id);
         selectedAddress.value = ""
+        toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Address deleted', life: 3000 });
 
     } catch (error) {
         console.error();
@@ -231,41 +246,53 @@ console.log('enter');
 
 const onSubmit = async()=>{
 
-   const p =await Promise.all(products.value?.map((i)=>{
-        return {
-            "unitPrice": i.product.price,
-            "quantity": i.quantity,
-            "subTotal": parseInt(i.quantity) * parseInt(i.product?.price),
-            "productId": i.product.id
-        } 
-    }))
+    console.log(selectedAddress.value, userAddress.value.length);
+    if (products.value.length == 0) {
+        toast.add({severity:'warn', summary: 'Warnign', detail: 'Add a product to your cart', life: 3000});
+    }else if (selectedAddress.value == null && userAddress.value.length > 0) {
+        toast.add({severity:'warn', summary: 'Warnign', detail: 'Select a shipping address', life: 3000});
+    }else if (userAddress.value.length == 0 && selectedAddress.value == null) {
+        toast.add({severity:'warn', summary: 'Warnign', detail: 'Add a new shipping address', life: 3000});
+    }else{
+            const p =await Promise.all(products.value?.map((i)=>{
+            return {
+                "unitPrice": i.product.price,
+                "quantity": i.quantity,
+                "subTotal": parseInt(i.quantity) * parseInt(i.product?.price),
+                "productId": i.product.id
+            } 
+            }))
 
-   try {
-        const response = await axios.post("sales",{
-            "totalAmount": getTotalAmount(),
-            "totalProducts": getTotalQty(),
-            "userId": user_id,
-            "address": selectedAddress.value.address,
-            "salesChild": p
-        })
+            try {
+            const response = await axios.post("sales",{
+                "totalAmount": getTotalAmount(),
+                "totalProducts": getTotalQty(),
+                "userId": user_id,
+                "address": selectedAddress.value.address,
+                "salesChild": p
+            })
 
-        products.value?.map(async (i)=>{
-            await axios.delete(`cart/${i.id}`)
-                .then((res)=>{
-                    console.log(res);
-                })
-                .catch(function (error) {
-                    // handle error
-                    console.log(error);
-                })
-        })
+            products.value?.map(async (i)=>{
+                await axios.delete(`cart/${i.id}`)
+                    .then((res)=>{
+                        console.log(res);
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+            })
 
-        products.value = null
+            products.value = null
+            toast.add({severity:'success', summary: 'Successful', detail: 'Your order is  placed', life: 3000});
         
 
-   } catch (error) {
-    console.error();
-   }
+            } catch (error) {
+                console.error();
+            }
+    }
+
+   
 }
 
 const getTotalAmount = (()=>{
@@ -278,6 +305,22 @@ const getTotalQty = (()=>{
         return total +item.quantity
       }, 0)
 })
+
+const confirm2 = (event) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Do you want to delete this address?',
+        icon: 'pi pi-info-circle',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            onAddressDelete()
+            
+        },
+        reject: () => {
+            // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+};
 
 
 </script>
