@@ -16,7 +16,10 @@ if (role == "ADMIN") {
         },
         {
             items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/productAdmin' }]
-        }
+        },
+        // {
+        //     items: [{ label: 'Reports', icon: 'pi pi-fw pi-book', to: '/reports' }]
+        // }
     ]
 } else {
     model.value = [

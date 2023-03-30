@@ -11,16 +11,15 @@
 
                 <template #end>
                 <!-- <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import"
-                                                                                                                                                                                                                                                                                                                                        class="mr-2 inline-block" /> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    class="mr-2 inline-block" /> -->
                     <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
                 </template>
             </Toolbar>
 
-            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" :paginator="true"
-                :rows="10" :filters="filters"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25]"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
+
+
+            <DataTable v-model:filters="filters" v-model:selection="selectedProducts" :value="products" paginator :rows="10"
+                dataKey="id" filterDisplay="row" :globalFilterFields="['name']">
                 <template #header>
                     <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
                         <h4 class="m-0">Manage Products</h4>
@@ -32,7 +31,15 @@
                 </template>
 
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                <Column field="name" header="Name" sortable style="min-width:16rem"></Column>
+                <Column field="name" header="Name" style="min-width: 12rem">
+                    <template #body="{ data }">
+                        {{ data.name }}
+                    </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                            placeholder="Search by name" />
+                    </template>
+                </Column>
                 <Column header="Image">
                     <template #body="slotProps">
                         <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.url}`"
@@ -44,10 +51,24 @@
                         Rs.{{ slotProps.data.price }}
                     </template>
                 </Column>
-                <Column field="category.name" header="Category" sortable style="min-width:8rem">
-                <!-- <template #body="slotProps">
-                        {{ slotProps.data.category.name }}
-                        </template> -->
+                <Column header="Category" filterField="category" :showFilterMenu="false"
+                    :filterMenuStyle="{ width: '14rem' }" style="min-width: 14rem">
+                    <template #body="{ data }">
+                        <div class="flex align-items-center gap-2">
+                            <span>{{ data.category.name }}</span>
+                        </div>
+                    </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="categories"
+                            optionLabel="name" placeholder="Any" class="p-column-filter" style="min-width: 14rem"
+                            :maxSelectedLabels="1">
+                            <template #option="slotProps">
+                                <div class="flex align-items-center gap-2">
+                                    <span>{{ slotProps.option.name }}</span>
+                                </div>
+                            </template>
+                        </MultiSelect>
+                    </template>
                 </Column>
                 <Column :exportable="false" style="min-width:8rem">
                     <template #body="slotProps">
@@ -170,7 +191,9 @@ const deleteProductsDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref();
 const filters = ref({
-    'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    category: { value: null, matchMode: FilterMatchMode.IN },
 });
 const submitted = ref(false);
 
@@ -215,6 +238,7 @@ const saveProduct = () => {
             }).then((response) => {
                 console.log(response.data);
             })
+            product.value.url = "product-placeholder.svg";
             products.value.push(product.value);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
         }
@@ -232,11 +256,20 @@ const confirmDeleteProduct = (prod) => {
     product.value = prod;
     deleteProductDialog.value = true;
 };
-const deleteProduct = () => {
-    products.value = products.value.filter(val => val.id !== product.value.id);
-    deleteProductDialog.value = false;
-    product.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+const deleteProduct = async () => {
+    await axios.delete(`product/${product.value.id}`)
+        .then((response) => {
+            console.log(response.data);
+
+            products.value = products.value.filter(val => val.id !== product.value.id);
+            deleteProductDialog.value = false;
+            product.value = {};
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+        }).catch((error) => {
+            console.log(error);
+        })
+
+
 };
 const findIndexById = (id) => {
     let index = -1;
@@ -253,7 +286,17 @@ const findIndexById = (id) => {
 const confirmDeleteSelected = () => {
     deleteProductsDialog.value = true;
 };
-const deleteSelectedProducts = () => {
+const deleteSelectedProducts = async () => {
+
+    Promise.all(
+        selectedProducts.value.map(async (i) => {
+            console.log(i.id);
+            await axios.delete(`product/${i.id}`)
+                .catch((error) => {
+                    console.log(error);
+                })
+        })
+    )
     products.value = products.value.filter(val => !selectedProducts.value.includes(val));
     deleteProductsDialog.value = false;
     selectedProducts.value = null;
