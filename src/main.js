@@ -37,6 +37,10 @@ import Tag from 'primevue/tag';
 import ConfirmDialog from 'primevue/confirmdialog';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmPopup from 'primevue/confirmpopup';
+import Toolbar from 'primevue/toolbar';
+import InputNumber from 'primevue/inputnumber';
+
+
 
 
 
@@ -79,6 +83,8 @@ app.component('Dropdown', Dropdown);
 app.component('Tag', Tag);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('ConfirmPopup', ConfirmPopup);
+app.component('Toolbar', Toolbar);
+app.component('InputNumber', InputNumber);
 
 
 

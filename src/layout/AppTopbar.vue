@@ -65,14 +65,14 @@ const isOutsideClicked = (event) => {
 
 <template>
     <div class="layout-topbar">
-       
+
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
         <router-link to="/" class="layout-topbar-logo">
             <!-- <img :src="logoUrl" alt="logo" /> -->
-            <span>Vue- Application</span>
+            <span>Vue Application</span>
         </router-link>
 
         <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
@@ -81,17 +81,17 @@ const isOutsideClicked = (event) => {
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button> -->
+                        <i class="pi pi-calendar"></i>
+                        <span>Calendar</span>
+                    </button> -->
             <button @click="onTopBarMenuButton()" label="Logout" class="p-link layout-topbar-button">
                 <i class="pi pi-fw pi-power-off"></i>
                 <span>Logout</span>
             </button>
             <!-- <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
-            </button> -->
+                        <i class="pi pi-cog"></i>
+                        <span>Settings</span>
+                    </button> -->
         </div>
     </div>
 </template>

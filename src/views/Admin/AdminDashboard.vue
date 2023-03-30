@@ -4,6 +4,6 @@
 
 <template>
   <main>
-    <h1> User Home Page</h1>
+    <h1> Admin Home Page</h1>
   </main>
 </template>

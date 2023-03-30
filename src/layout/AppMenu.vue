@@ -3,26 +3,41 @@ import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 
-const model = ref([
-    {
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
-    },
-    {
-        items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/product' }]
-    },
-    {
-        items: [{ label: 'Cart', icon: 'pi pi-fw pi-cart-plus', to: '/cart' }]
-    },
-    {
-        items: [{ label: 'Orders', icon: 'pi pi-fw pi-shopping-bag', to: '/orders' }]
-    },
-    {
-        items: [{ label: 'Sales Return', icon: 'pi pi-fw pi-undo', to: '/salesReturn' }]
-    },
+const role = localStorage.getItem("role");
+const model = ref([])
 
+if (role == "ADMIN") {
+    model.value = [
+        {
+            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/adminDashboard' }]
+        },
+        {
+            items: [{ label: 'Category', icon: 'pi pi-fw pi-shopping-bag', to: '/category' }]
+        },
+        {
+            items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/productAdmin' }]
+        }
+    ]
+} else {
+    model.value = [
+        {
+            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+        },
+        {
+            items: [{ label: 'Products', icon: 'pi pi-fw pi-table', to: '/product' }]
+        },
+        {
+            items: [{ label: 'Cart', icon: 'pi pi-fw pi-cart-plus', to: '/cart' }]
+        },
+        {
+            items: [{ label: 'Orders', icon: 'pi pi-fw pi-shopping-bag', to: '/orders' }]
+        },
+        {
+            items: [{ label: 'Sales Return', icon: 'pi pi-fw pi-undo', to: '/salesReturn' }]
+        },
+    ];
+}
 
-
-]);
 </script>
 
 <template>

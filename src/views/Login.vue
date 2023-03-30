@@ -96,10 +96,16 @@ async function onSubmit() {
                     var decoded = jwt_decode(response.data.access_token);
                     console.log('decoded token :' + JSON.stringify(decoded))
                     localStorage.setItem("user_id", decoded.sub)
+                    localStorage.setItem("role", decoded.role)
+                    if (decoded.role == 'ADMIN') {
+                        router.push('/adminDashboard')
+                    } else {
+                        router.push('/')
+                    }
                 })
                     .finally(() => {
                         loading.value = false;
-                        router.push('/')
+
                     })
 
             } catch (error) {

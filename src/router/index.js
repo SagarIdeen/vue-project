@@ -49,6 +49,22 @@ const router = createRouter({
           name: 'salesReturn',
           component: () => import('../views/SalesReturnView.vue'),
         },
+        // Admin routes
+        {
+          path: '/adminDashboard',
+          name: 'adminDashboard',
+          component: () => import('../views/Admin/AdminDashboard.vue'),
+        },
+        {
+          path: '/category',
+          name: 'category',
+          component: () => import('../views/Admin/CategoryView.vue'),
+        },
+        {
+          path: '/productAdmin',
+          name: 'productAdmin',
+          component: () => import('../views/Admin/ProductAdminView.vue'),
+        },
       ]
     },
   ]
