@@ -7,12 +7,16 @@ import './axios';
 import '@/assets/styles.scss';
 
 
+
+
+
 import "./assets/app.css"
 import "primevue/resources/themes/lara-light-indigo/theme.css"; 
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import '/node_modules/primeflex/primeflex.css'  
         // PrimeFlex
+
 
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
@@ -39,7 +43,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmPopup from 'primevue/confirmpopup';
 import Toolbar from 'primevue/toolbar';
 import InputNumber from 'primevue/inputnumber';
-
+import Card from 'primevue/card';
 
 
 
@@ -53,7 +57,6 @@ import InputNumber from 'primevue/inputnumber';
 
 const app = createApp(App)
 const pinia = createPinia()
-
 
 app.use(router)
 app.use(PrimeVue);
@@ -85,6 +88,7 @@ app.component('ConfirmDialog', ConfirmDialog);
 app.component('ConfirmPopup', ConfirmPopup);
 app.component('Toolbar', Toolbar);
 app.component('InputNumber', InputNumber);
+app.component('Card',Card)
 
 
 

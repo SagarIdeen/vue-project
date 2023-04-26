@@ -10,8 +10,8 @@
                 </template>
 
                 <template #end>
-                <!-- <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import"
-                                                                                                                                                                                                                                                                                                                                        class="mr-2 inline-block" /> -->
+                    <!-- <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    class="mr-2 inline-block" /> -->
                     <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
                 </template>
             </Toolbar>
@@ -35,8 +35,14 @@
                 <Column field="name" header="Name" sortable style="min-width:16rem"></Column>
                 <Column header="Image">
                     <template #body="slotProps">
+                        <!-- <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.url}` || `http://localhost:3000/resource/${slotProps.data.url}`"
+                            :alt="slotProps.data.url" class="shadow-2 border-round" style="width: 64px" /> -->
                         <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.url}`"
-                            :alt="slotProps.data.url" class="shadow-2 border-round" style="width: 64px" />
+                            :alt="slotProps.data.url" class="shadow-2 border-round" style="width: 64px"
+                            @error="(event) => { event.target.src = `http://localhost:3000/resource/200x200/200x200_${slotProps.data.url}` }" />
+
+
+
                     </template>
                 </Column>
                 <Column field="price" header="Price" sortable style="min-width:8rem">
@@ -45,9 +51,7 @@
                     </template>
                 </Column>
                 <Column field="category.name" header="Category" sortable style="min-width:8rem">
-                <!-- <template #body="slotProps">
-                        {{ slotProps.data.category.name }}
-                        </template> -->
+
                 </Column>
                 <Column :exportable="false" style="min-width:8rem">
                     <template #body="slotProps">
@@ -63,18 +67,28 @@
             class="p-fluid">
             <img v-if="product.url" :src="`https://primefaces.org/cdn/primevue/images/product/${product.url}`"
                 :alt="product.url" class="block m-auto pb-3" />
-            <div class="field">
+
+
+
+
+            <FileUpload ref="fileUploadRef" @upload-event="handleUploadEvent" :max-length="1"
+                accepted-files="application/pdf,image/*" :button-visible="false" />
+
+
+
+
+            <div class="field mt-3">
                 <label for="name">Product Name</label>
                 <InputText id="name" v-model.trim="product.name" required="true" autofocus
                     :class="{ 'p-invalid': submitted && !product.name }" />
                 <small class="p-error" v-if="submitted && !product.name">Name is required.</small>
             </div>
-            <div class="field">
+            <!-- <div class="field">
                 <label for="price">Url</label>
                 <InputText id="price" v-model.trim="product.url" required="true" autofocus
                     :class="{ 'p-invalid': submitted && !product.url }" />
                 <small class="p-error" v-if="submitted && !product.url">image is required.</small>
-            </div>
+            </div> -->
 
             <div class="field">
                 <label for="inventoryStatus" class="mb-3">Category</label>
@@ -140,6 +154,10 @@ import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
+import FileUpload from '../../components/FileUploadComponent/MultipleFileUpload.vue'
+
+
+
 
 onMounted(() => {
     axios.get("product")
@@ -174,6 +192,10 @@ const filters = ref({
 });
 const submitted = ref(false);
 
+const file = ref([]);
+
+const fileUploadRef = ref(null)
+
 const openNew = () => {
     product.value = {};
     submitted.value = false;
@@ -183,7 +205,8 @@ const hideDialog = () => {
     productDialog.value = false;
     submitted.value = false;
 };
-const saveProduct = () => {
+const saveProduct = async () => {
+
     submitted.value = true;
     if (product.value.name.trim()) {
         if (product.value.id) {
@@ -205,10 +228,14 @@ const saveProduct = () => {
         else {
             console.log('on edit4:', JSON.stringify(product.value));
 
+            const filesData = await fileUploadRef.value.getImages();
+
+            await onUpload(filesData)
+
             axios.post("product", {
                 "name": product.value.name,
                 "price": product.value.price,
-                "url": "product-placeholder.svg", //default
+                "url": filesData[0].name, //default
                 "categoryId": product.value.category.id
             }).catch((error) => {
                 console.log(error);
@@ -259,5 +286,28 @@ const deleteSelectedProducts = () => {
     selectedProducts.value = null;
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
 };
+
+const onUpload = async (filesData) => {
+
+    const formData = new FormData();
+    formData.append('file', filesData[0]);
+    console.log(JSON.stringify(formData));
+    axios.post("image-upload/upload", formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then((response) => {
+        console.log('ress', response);
+    }).catch((err) => {
+        console.log(err);
+    })
+
+
+};
+
+
+
+
+
 
 </script>
